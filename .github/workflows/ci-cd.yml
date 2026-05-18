@@ -2,6 +2,7 @@ name: Train & Deploy to Hugging Face
 on:
   push:
     branches: [ main ]
+
 jobs:
   train-and-deploy:
     runs-on: ubuntu-latest
@@ -27,15 +28,23 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # 替换成你自己的 HF 用户名和空间名
-          HF_USER="Swb20"
+          # --- 这里改成你的HF信息 ---
+          HF_USER="asasdj"
           HF_SPACE="imdb-sentiment-nn"
-          git config --global user.email "swb20@example.com"
-          git config --global user.name "Swb20"
+          # -------------------------
+          
+          git config --global user.email "asasdj@example.com"
+          git config --global user.name "asasdj"
+          
+          # 创建/更新Space
           huggingface-cli repo create $HF_SPACE --type space --space_sdk gradio --yes
           git clone https://huggingface.co/spaces/$HF_USER/$HF_SPACE deploy
+          
+          # 复制文件
           cp app.py requirements.txt deploy/
           cp -r model/ deploy/
+          
+          # 部署
           cd deploy
           git add .
           git commit -m "Deploy from GitHub CI/CD" || echo "Nothing to commit"
