@@ -1,4 +1,4 @@
-name: Train & Deploy
+name: Train & Deploy to Hugging Face
 on:
   push:
     branches: [ main ]
@@ -7,7 +7,9 @@ jobs:
   train-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -15,31 +17,21 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install huggingface-hub
 
       - name: Train model
         run: python train.py
 
-      - name: Deploy to Hugging Face
+      - name: Deploy to Hugging Face (using new hf command)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          huggingface-cli upload \
-            asasdj/imdb-sentiment-nn \
-            ./model \
-            model \
-            --token $HF_TOKEN
-
-          huggingface-cli upload \
-            asasdj/imdb-sentiment-nn \
-            app.py \
-            app.py \
-            --token $HF_TOKEN
-
-          huggingface-cli upload \
-            asasdj/imdb-sentiment-nn \
-            requirements.txt \
-            requirements.txt \
-            --token $HF_TOKEN
+          # 登录Hugging Face
+          hf auth login --token $HF_TOKEN
+          
+          # 上传所有文件到你的Space
+          hf upload asasdj/imdb-sentiment-nn app.py --repo-type space
+          hf upload asasdj/imdb-sentiment-nn requirements.txt --repo-type space
+          hf upload asasdj/imdb-sentiment-nn model/ --repo-type space --include "model/*"
