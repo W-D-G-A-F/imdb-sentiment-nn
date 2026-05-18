@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -15,21 +16,29 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # 1. 自动修复 requirements.txt 第一行的无用标记（防止报错）
+          sed -i 's/\\]//g' requirements.txt
+          
+          # 2. 安装依赖
           pip install --upgrade pip
           pip install -r requirements.txt
           pip install huggingface-hub
 
       - name: Train model
-        run: python train.py
+        run: |
+          # 此时 GitHub 会自动在云端下载你的 data/ 里面的数据并开始训练
+          python train.py
 
       - name: Deploy to HF Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          hf auth login --token $HF_TOKEN
+          # 3. 规范的文件上传：
+          # 直接上传 app.py
+          hf upload asasdj/imdb-sentiment-nn ./app.py app.py --repo-type space
           
-          # 上传单个文件（语法：hf upload repo_id local_path:repo_path）
-          hf upload asasdj/imdb-sentiment-nn app.py:app.py --repo-type space
-          hf upload asasdj/imdb-sentiment-nn requirements.txt:requirements.txt --repo-type space
-          hf upload asasdj/imdb-sentiment-nn model/tfidf.pkl:model/tfidf.pkl --repo-type space
-          hf upload asasdj/imdb-sentiment-nn model/imdb_nn_model.h5:model/imdb_nn_model.h5 --repo-type space
+          # 直接上传清理后的 requirements.txt
+          hf upload asasdj/imdb-sentiment-nn ./requirements.txt requirements.txt --repo-type space
+          
+          # 一键把训练好的整个 model 文件夹全部打包传上去！不再需要单独传 pkl 和 h5 文件了
+          hf upload asasdj/imdb-sentiment-nn ./model model --repo-type space
