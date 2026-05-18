@@ -1,4 +1,4 @@
-name: Train & Deploy to HF
+name: Train & Deploy
 on:
   push:
     branches: [ main ]
@@ -7,9 +7,7 @@ jobs:
   train-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -17,23 +15,21 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
           pip install huggingface-hub
 
       - name: Train model
         run: python train.py
 
-      - name: Deploy to Hugging Face
+      - name: Deploy to HF Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           hf auth login --token $HF_TOKEN
           
-          # 上传单个文件
-          hf upload asasdj/imdb-sentiment-nn app.py --repo-type space
-          hf upload asasdj/imdb-sentiment-nn requirements.txt --repo-type space
-          
-          # 上传 model 文件夹里的所有文件（用通配符）
-          hf upload asasdj/imdb-sentiment-nn model/tfidf.pkl --repo-type space --path-in-repo model/tfidf.pkl
-          hf upload asasdj/imdb-sentiment-nn model/imdb_nn_model.h5 --repo-type space --path-in-repo model/imdb_nn_model.h5
+          # 上传单个文件（语法：hf upload repo_id local_path:repo_path）
+          hf upload asasdj/imdb-sentiment-nn app.py:app.py --repo-type space
+          hf upload asasdj/imdb-sentiment-nn requirements.txt:requirements.txt --repo-type space
+          hf upload asasdj/imdb-sentiment-nn model/tfidf.pkl:model/tfidf.pkl --repo-type space
+          hf upload asasdj/imdb-sentiment-nn model/imdb_nn_model.h5:model/imdb_nn_model.h5 --repo-type space
