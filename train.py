@@ -1,15 +1,19 @@
 import pandas as pd
 import numpy as np
 import joblib
+import os  # 导入os模块创建文件夹
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 
+# 关键：先创建model文件夹
+os.makedirs("model", exist_ok=True)
+
 # 加载数据集（匹配你的CSV列名）
 df = pd.read_csv("data/imdb_top_500.csv")
-x = df["text"]  # 影评文本列
-y = df["label"] # 情感标签列（0=负面，1=正面）
+x = df["text"]
+y = df["label"]
 
 # TF-IDF向量化
 vec = TfidfVectorizer(max_features=5000)
