@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 
-df = pd.read_csv('data/imdb_balanced_10k.csv')
+df = pd.read_csv('data/imdb_top_500.csv')
 x = df['review']
 y = df['sentiment']
 
