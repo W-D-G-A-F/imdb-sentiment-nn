@@ -24,19 +24,16 @@ jobs:
       - name: Train model
         run: python train.py
 
-      # 这里是关键：用 hf 命令一次性上传所有文件
       - name: Deploy to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # 先登录
           hf auth login --token $HF_TOKEN
           
-          # 上传 app.py
+          # 上传单个文件
           hf upload asasdj/imdb-sentiment-nn app.py --repo-type space
-          
-          # 上传 requirements.txt
           hf upload asasdj/imdb-sentiment-nn requirements.txt --repo-type space
           
-          # 上传整个 model 文件夹（包括所有子文件）
-          hf upload asasdj/imdb-sentiment-nn model --repo-type space --recursive
+          # 上传 model 文件夹里的所有文件（用通配符）
+          hf upload asasdj/imdb-sentiment-nn model/tfidf.pkl --repo-type space --path-in-repo model/tfidf.pkl
+          hf upload asasdj/imdb-sentiment-nn model/imdb_nn_model.h5 --repo-type space --path-in-repo model/imdb_nn_model.h5
