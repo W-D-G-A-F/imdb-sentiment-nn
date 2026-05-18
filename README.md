@@ -5,7 +5,7 @@ colorFrom: blue
 colorTo: purple
 sdk: gradio
 sdk_version: 4.26.0
-python_version: 3.10  # 👈 核心：强制指定 Python 版本，避开 3.13 的不兼容问题
+python_version: "3.10"  # 👈 核心：加上双引号 ""，防止被缩写成 3.1
 app_file: app.py
 pinned: false
 ---
